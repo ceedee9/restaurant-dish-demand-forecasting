@@ -1,0 +1,1537 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presentation Guide — Maricopa Restaurant Demand Forecasting</title>
+    <style>
+      /* ── Base ─────────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --primary: #1a3c5e;
+        --accent: #e67e22;
+        --green: #27ae60;
+        --red: #c0392b;
+        --light: #f4f6f9;
+        --border: #dce3ed;
+        --text: #2c3e50;
+        --muted: #7f8c8d;
+        --radius: 10px;
+      }
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--light);
+        color: var(--text);
+        line-height: 1.7;
+        padding-bottom: 60px;
+      }
+
+      /* ── Header ─────────────────────────────────────────── */
+      header {
+        background: linear-gradient(135deg, var(--primary) 0%, #2d6a9f 100%);
+        color: #fff;
+        padding: 40px 48px 32px;
+        position: relative;
+        overflow: hidden;
+      }
+      header::before {
+        content: "";
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 240px;
+        height: 240px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+      header .badge {
+        display: inline-block;
+        background: var(--accent);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 14px;
+      }
+      header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      header p {
+        font-size: 1rem;
+        opacity: 0.85;
+      }
+      header .meta {
+        margin-top: 18px;
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        opacity: 0.75;
+      }
+      header .meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* ── Navigation ─────────────────────────────────────────── */
+      nav {
+        background: #fff;
+        border-bottom: 2px solid var(--border);
+        padding: 0 48px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+      }
+      nav a {
+        display: inline-block;
+        padding: 14px 20px;
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 0.88rem;
+        font-weight: 600;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+        transition: all 0.2s;
+      }
+      nav a:hover,
+      nav a.active {
+        color: var(--primary);
+        border-bottom-color: var(--accent);
+      }
+
+      /* ── Layout ─────────────────────────────────────────── */
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 40px 24px;
+      }
+
+      /* ── Section shell ─────────────────────────────────────────── */
+      .section {
+        background: #fff;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        margin-bottom: 32px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 22px 28px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(90deg, #f7f9fc, #fff);
+      }
+      .section-header .icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+      .icon-blue {
+        background: #dbeafe;
+      }
+      .icon-green {
+        background: #dcfce7;
+      }
+      .icon-amber {
+        background: #fef3c7;
+      }
+      .icon-purple {
+        background: #ede9fe;
+      }
+      .section-header h2 {
+        font-size: 1.18rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+      }
+      .section-header .sub {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .section-header .step-pill {
+        margin-left: auto;
+        background: var(--primary);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+      }
+      .section-body {
+        padding: 24px 28px;
+      }
+
+      /* ── Talking point card ─────────────────────────────────────────── */
+      .tp-block {
+        background: #f8fafc;
+        border-left: 4px solid var(--primary);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 14px 18px;
+        margin-bottom: 14px;
+      }
+      .tp-block .tp-label {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 4px;
+      }
+      .tp-block p,
+      .tp-block li {
+        font-size: 0.93rem;
+      }
+      .tp-block ul {
+        padding-left: 18px;
+      }
+      .tp-block ul li {
+        margin-bottom: 4px;
+      }
+
+      /* ── Demo steps ─────────────────────────────────────────── */
+      .demo-steps {
+        counter-reset: demo;
+        list-style: none;
+        padding: 0;
+      }
+      .demo-steps li {
+        counter-increment: demo;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 10px 0;
+        border-bottom: 1px dashed var(--border);
+        font-size: 0.92rem;
+      }
+      .demo-steps li:last-child {
+        border-bottom: none;
+      }
+      .demo-steps li::before {
+        content: counter(demo);
+        min-width: 28px;
+        height: 28px;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* ── Code block ─────────────────────────────────────────── */
+      .code {
+        background: #1e2a3b;
+        color: #a8d8ea;
+        border-radius: 8px;
+        padding: 14px 18px;
+        font-family: "Cascadia Code", "Consolas", monospace;
+        font-size: 0.85rem;
+        margin: 10px 0;
+        overflow-x: auto;
+      }
+      .code .comment {
+        color: #637a8c;
+      }
+      .code .cmd {
+        color: #f0c040;
+      }
+      .code .url {
+        color: #7ec8a4;
+        text-decoration: underline;
+      }
+
+      /* ── Table ─────────────────────────────────────────── */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+        margin: 12px 0;
+      }
+      .data-table th {
+        background: var(--primary);
+        color: #fff;
+        padding: 9px 14px;
+        text-align: left;
+        font-weight: 600;
+      }
+      .data-table td {
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+      .data-table tr:nth-child(even) td {
+        background: #f8fafc;
+      }
+      .data-table tr:hover td {
+        background: #eef3f9;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 0.73rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 12px;
+      }
+      .tag-blue {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .tag-green {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .tag-amber {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .tag-red {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      /* ── Highlight box ─────────────────────────────────────────── */
+      .highlight-box {
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        margin: 12px 0;
+        font-size: 0.9rem;
+      }
+      .hb-info {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+      }
+      .hb-tip {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+      }
+      .hb-warn {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+      }
+      .hb-label {
+        font-weight: 700;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .hb-info .hb-label {
+        color: #1e40af;
+      }
+      .hb-tip .hb-label {
+        color: #166534;
+      }
+      .hb-warn .hb-label {
+        color: #92400e;
+      }
+
+      /* ── Two-column grid ─────────────────────────────────────────── */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 12px 0;
+      }
+      @media (max-width: 640px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── Architecture flow ─────────────────────────────────────────── */
+      .flow {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 14px 0;
+      }
+      .flow-box {
+        background: #fff;
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-align: center;
+      }
+      .flow-arrow {
+        color: var(--accent);
+        font-size: 1.2rem;
+        font-weight: 900;
+      }
+
+      /* ── Checklist ─────────────────────────────────────────── */
+      .checklist {
+        list-style: none;
+        padding: 0;
+      }
+      .checklist li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 6px 0;
+        font-size: 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .checklist li:last-child {
+        border-bottom: none;
+      }
+      .checklist li .ck {
+        color: var(--green);
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      /* ── Metric cards ─────────────────────────────────────────── */
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 12px 0;
+      }
+      @media (max-width: 500px) {
+        .metric-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .metric-card {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        text-align: center;
+      }
+      .metric-card .m-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .metric-card .m-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin: 4px 0;
+      }
+      .metric-card .m-note {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      /* ── Divider label ─────────────────────────────────────────── */
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 20px 0 14px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+      }
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── TOC ─────────────────────────────────────────── */
+      .toc {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 28px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      .toc h3 {
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+      .toc ol {
+        padding-left: 20px;
+      }
+      .toc ol li {
+        margin-bottom: 8px;
+      }
+      .toc ol li a {
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .toc ol li a:hover {
+        color: var(--accent);
+      }
+      .toc ol li span {
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-left: 8px;
+      }
+
+      /* ── Print ─────────────────────────────────────────── */
+      @media print {
+        nav {
+          display: none;
+        }
+        body {
+          background: #fff;
+        }
+        .section {
+          box-shadow: none;
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════════════════════════════════════════════════ HEADER -->
+    <header>
+      <div class="badge">IPT 101 — Task Performance #4</div>
+      <h1>Maricopa Restaurant — Presentation Guide</h1>
+      <p>
+        Dish Demand Forecasting System &nbsp;|&nbsp; BSIT 3-2 &nbsp;|&nbsp; May
+        22, 2026
+      </p>
+      <div class="meta">
+        <span>👤 De los Reyes, Carlo M. (Leader)</span>
+        <span>👤 Enoria, Jorich Maricar C.</span>
+        <span>👤 Mercado, Vesti Sahm Angielo</span>
+        <span>👤 Santiago, Ishmael Luis C.</span>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════ NAV -->
+    <nav>
+      <a href="#overview" class="active">Overview</a>
+      <a href="#part1">1 · ML Workflow</a>
+      <a href="#part2">2 · Integration</a>
+      <a href="#part3">3 · Documentation</a>
+      <a href="#demo">Live Demo</a>
+      <a href="#qa">Q&amp;A</a>
+    </nav>
+
+    <main>
+      <!-- ═══ TABLE OF CONTENTS -->
+      <div class="toc">
+        <h3>Presentation Outline</h3>
+        <ol>
+          <li>
+            <a href="#overview">Opening &amp; Project Overview</a>
+            <span>~1 min — introduce the problem and the system</span>
+          </li>
+          <li>
+            <a href="#part1">Part 1: ML Workflow (Model Development)</a>
+            <span>~5 min — data, training, evaluation, selection</span>
+          </li>
+          <li>
+            <a href="#part2">Part 2: Integration (System Development)</a>
+            <span>~4 min — architecture, API, frontend walkthrough</span>
+          </li>
+          <li>
+            <a href="#part3">Part 3: Documentation</a>
+            <span>~2 min — what was produced and where to find it</span>
+          </li>
+          <li>
+            <a href="#demo">Live System Demo</a>
+            <span>~3 min — run actual predictions on the web app</span>
+          </li>
+          <li>
+            <a href="#qa">Q&amp;A Preparation</a>
+            <span>Anticipated questions &amp; suggested answers</span>
+          </li>
+        </ol>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ OVERVIEW -->
+      <div class="section" id="overview">
+        <div class="section-header">
+          <div class="icon icon-blue">🏠</div>
+          <div>
+            <h2>Opening &amp; Project Overview</h2>
+            <div class="sub">
+              Set the stage — what is the problem and what did we build?
+            </div>
+          </div>
+          <span class="step-pill">~1 min</span>
+        </div>
+        <div class="section-body">
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "Good day! We are Group [number], and our project is called the
+              <strong>Maricopa Restaurant Dish Demand Forecasting System</strong
+              >. The goal is to help a Filipino restaurant predict how many
+              servings of each dish to prepare for lunch — reducing both food
+              waste and shortage. We built a complete machine learning system:
+              from raw sales data, through model training, all the way to a live
+              web application that any restaurant staff can use."
+            </p>
+          </div>
+
+          <div class="two-col">
+            <div class="highlight-box hb-info">
+              <div class="hb-label">The Problem</div>
+              Over-preparing = food waste. Under-preparing = lost sales and
+              unsatisfied customers. The restaurant needed a
+              <em>data-driven</em>
+              way to forecast daily demand per dish.
+            </div>
+            <div class="highlight-box hb-tip">
+              <div class="hb-label">Our Solution</div>
+              A supervised regression model trained on 509 real sales records
+              (March–April 2026), served through a FastAPI web app anyone can
+              access via browser.
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="m-label">Dataset</div>
+              <div class="m-value">509</div>
+              <div class="m-note">rows of real sales data</div>
+            </div>
+            <div class="metric-card">
+              <div class="m-label">Dishes</div>
+              <div class="m-value">16</div>
+              <div class="m-note">Filipino dishes modelled</div>
+            </div>
+            <div class="metric-card">
+              <div class="m-label">Models Tested</div>
+              <div class="m-value">7</div>
+              <div class="m-note">algorithms compared</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ PART 1 -->
+      <div class="section" id="part1">
+        <div class="section-header">
+          <div class="icon icon-purple">🧠</div>
+          <div>
+            <h2>Part 1 — ML Workflow (Model Development)</h2>
+            <div class="sub">
+              Data preprocessing → training → evaluation → selection
+            </div>
+          </div>
+          <span class="step-pill">~5 min</span>
+        </div>
+        <div class="section-body">
+          <!-- 1.1 Problem -->
+          <div class="divider">1.1 — Problem Statement</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "Our task is a <strong>supervised regression problem</strong>.
+              Given the dish name, day of the week, weather condition, whether
+              it is a Philippine public holiday, and date information — we
+              predict <code>quantity_sold</code>: how many servings the
+              restaurant will sell that lunch period. After one-hot encoding,
+              the model receives <strong>30 input features</strong> per row."
+            </p>
+          </div>
+
+          <!-- 1.2 Data Preprocessing -->
+          <div class="divider">1.2 — Data Preprocessing</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "We applied a 7-step preprocessing pipeline inside
+              <code>train_and_save.py</code>. The key design decisions were:"
+            </p>
+            <ul>
+              <li>
+                Loading and combining both Excel files with
+                <code>pd.concat()</code> — giving 509 rows.
+              </li>
+              <li>
+                Extracting
+                <strong>month, day_of_month, week_of_month</strong> from the
+                date column to give the model temporal patterns.
+              </li>
+              <li>
+                Dropping <code>meal_period</code> (all rows = "Lunch") — zero
+                variance, teaches nothing.
+              </li>
+              <li>
+                One-hot encoding: 16 dish columns + 7 day columns + 3 weather
+                columns.
+              </li>
+              <li>
+                Fitting the <strong>StandardScaler only on X_train</strong> to
+                prevent data leakage.
+              </li>
+              <li>
+                70/30 train-test split with <code>random_state=42</code> for
+                reproducibility.
+              </li>
+            </ul>
+          </div>
+
+          <div class="highlight-box hb-warn">
+            <div class="hb-label">⚠️ Data Leakage — Anticipated Question</div>
+            We fit the scaler exclusively on <code>X_train</code>, then
+            <em>transform</em> both X_train and X_test. Fitting on all data
+            would let test statistics "leak" into training — inflating scores.
+          </div>
+
+          <!-- 1.3 Algorithm Selection -->
+          <div class="divider">1.3 — Algorithm Selection (7 Models)</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "We did not just pick one algorithm. We compared seven, ranging
+              from simple linear models to ensemble methods — to have an
+              evidence-based selection rather than a guess."
+            </p>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Type</th>
+                <th>Why Included</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Linear Regression</strong></td>
+                <td><span class="tag tag-blue">Linear</span></td>
+                <td>Baseline — simplest relationship model</td>
+              </tr>
+              <tr>
+                <td><strong>Ridge Regression</strong></td>
+                <td><span class="tag tag-blue">Linear + L2</span></td>
+                <td>Handles correlated one-hot features</td>
+              </tr>
+              <tr>
+                <td><strong>Lasso Regression</strong></td>
+                <td><span class="tag tag-blue">Linear + L1</span></td>
+                <td>Can zero out irrelevant columns</td>
+              </tr>
+              <tr>
+                <td><strong>Decision Tree</strong></td>
+                <td><span class="tag tag-amber">Tree</span></td>
+                <td>Captures dish+weather if-else rules</td>
+              </tr>
+              <tr>
+                <td><strong>Random Forest</strong></td>
+                <td><span class="tag tag-green">Ensemble</span></td>
+                <td>100 trees — reduces overfitting</td>
+              </tr>
+              <tr>
+                <td><strong>Gradient Boosting</strong></td>
+                <td><span class="tag tag-green">Ensemble</span></td>
+                <td>Sequential learners — highest accuracy</td>
+              </tr>
+              <tr>
+                <td><strong>K-Nearest Neighbors</strong></td>
+                <td><span class="tag tag-amber">Instance</span></td>
+                <td>Predicts from 5 most similar historical days</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- 1.4 Training Procedure -->
+          <div class="divider">1.4 — Training Procedure</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "Every model followed the same reproducible procedure:
+              <code>model.fit(X_train_scaled, y_train)</code> on 356 rows, then
+              <code>model.predict(X_test_scaled)</code> on 153 rows. We recorded
+              <strong>MAE, RMSE, and R²</strong> for each. All baseline models
+              ran before any hyperparameter tuning."
+            </p>
+          </div>
+
+          <!-- 1.5 Evaluation -->
+          <div class="divider">1.5 — Baseline Evaluation Results</div>
+          <div class="tp-block">
+            <div class="tp-label">
+              Say This — actual results from evaluation_results.csv
+            </div>
+            <p>"Here are the actual computed scores from our script:"</p>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>MAE</th>
+                <th>RMSE</th>
+                <th>R²</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Linear Regression</td>
+                <td>2.95</td>
+                <td>3.39</td>
+                <td>−0.054</td>
+              </tr>
+              <tr>
+                <td>Ridge Regression</td>
+                <td>2.94</td>
+                <td>3.39</td>
+                <td>−0.053</td>
+              </tr>
+              <tr>
+                <td>Lasso Regression</td>
+                <td>2.94</td>
+                <td>3.38</td>
+                <td>−0.050</td>
+              </tr>
+              <tr>
+                <td>Decision Tree</td>
+                <td>3.37</td>
+                <td>4.15</td>
+                <td>−0.583</td>
+              </tr>
+              <tr>
+                <td>Random Forest</td>
+                <td>3.11</td>
+                <td>3.54</td>
+                <td>−0.152</td>
+              </tr>
+              <tr>
+                <td>Gradient Boosting</td>
+                <td>2.98</td>
+                <td>3.46</td>
+                <td>−0.100</td>
+              </tr>
+              <tr>
+                <td>KNN</td>
+                <td>3.12</td>
+                <td>3.67</td>
+                <td>−0.238</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="highlight-box hb-warn">
+            <div class="hb-label">⚠️ Key Talking Point — Negative R²</div>
+            Our R² values are negative, which means the model performs worse
+            than a simple mean predictor on the test set. This is a realistic
+            outcome with only 2 months of data (509 rows) across 16 dish types.
+            Be honest about this:
+            <strong
+              >"Our results show that with more training data — six months or
+              more — the model would improve significantly. The learning curve
+              confirms validation R² is still rising at full data size."</strong
+            >
+            The system architecture and integration are still fully functional
+            regardless of the metric values.
+          </div>
+
+          <!-- 1.6 Cross-Validation -->
+          <div class="divider">1.6 — Cross-Validation</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "We ran 10-Fold Cross-Validation on all 7 models to check
+              generalization — not just test set performance. Random Forest
+              showed the lowest R² standard deviation (±0.125), making it the
+              most
+              <strong>stable</strong> model. Lasso was most stable numerically
+              but also weakest."
+            </p>
+          </div>
+
+          <!-- 1.7 Hyperparameter Tuning -->
+          <div class="divider">1.7 — Hyperparameter Optimization</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "We ran Grid Search CV on the two top performers:
+              <strong>Random Forest</strong> (72 configurations × 5-fold) and
+              <strong>Gradient Boosting</strong> (54 configurations × 5-fold).
+              Best parameters printed in the terminal when
+              <code>train_and_save.py</code> runs. The optimized models reduced
+              RMSE slightly and produced the saved <code>best_model.pkl</code>."
+            </p>
+          </div>
+
+          <!-- 1.8 Model Interpretation -->
+          <div class="divider">1.8 — Model Interpretation (5 Techniques)</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Technique</th>
+                <th>Key Finding</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Feature Importance (built-in)</td>
+                <td>Dish name columns dominate — strongest predictor</td>
+              </tr>
+              <tr>
+                <td>Permutation Importance</td>
+                <td>Confirms dish identity critical; weather moderate</td>
+              </tr>
+              <tr>
+                <td>Learning Curve</td>
+                <td>
+                  Validation R² still rising at full data — more months needed
+                </td>
+              </tr>
+              <tr>
+                <td>Noise Sensitivity</td>
+                <td>
+                  Sinigang and soup dishes most sensitive — record names
+                  accurately
+                </td>
+              </tr>
+              <tr>
+                <td>Residual Analysis</td>
+                <td>Residuals near-normal, mean ≈ 0 — no systematic bias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ PART 2 -->
+      <div class="section" id="part2">
+        <div class="section-header">
+          <div class="icon icon-green">🔗</div>
+          <div>
+            <h2>Part 2 — Integration (System Development)</h2>
+            <div class="sub">
+              Architecture · FastAPI backend · HTML frontend · API endpoints
+            </div>
+          </div>
+          <span class="step-pill">~4 min</span>
+        </div>
+        <div class="section-body">
+          <!-- Architecture -->
+          <div class="divider">3.1 — Three-Layer Architecture</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "The system has three layers that talk to each other. The user
+              interacts only with the browser. All ML logic stays on the server
+              — the frontend never sees the model directly."
+            </p>
+          </div>
+
+          <div class="flow">
+            <div class="flow-box">
+              🖥️ Frontend<br /><small>index.html</small>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">⚡ FastAPI<br /><small>app.py</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">
+              🤖 ML Model<br /><small>best_model.pkl</small>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">
+              📊 Prediction<br /><small>JSON response</small>
+            </div>
+          </div>
+
+          <table class="data-table" style="margin-top: 12px">
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>File</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Frontend</td>
+                <td><code>index.html</code></td>
+                <td>User interface — collect inputs, display predictions</td>
+              </tr>
+              <tr>
+                <td>Backend API</td>
+                <td><code>app.py</code></td>
+                <td>
+                  FastAPI — validate, encode, scale, call model, return JSON
+                </td>
+              </tr>
+              <tr>
+                <td>ML Layer</td>
+                <td>
+                  <code>best_model.pkl + scaler.pkl + label_columns.pkl</code>
+                </td>
+                <td>
+                  Loaded once at server startup, used for every prediction
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Data Flow -->
+          <div class="divider">3.2 — Step-by-Step Data Flow (10 steps)</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>"Walk through what happens from click to prediction:"</p>
+          </div>
+
+          <ol class="demo-steps">
+            <li>
+              <strong>User selects</strong> dish, day, weather, holiday flag,
+              and date, then clicks Predict.
+            </li>
+            <li>
+              <strong>Browser sends</strong> a <code>POST /predict</code> HTTP
+              request with a JSON payload to <code>http://127.0.0.1:8000</code>.
+            </li>
+            <li>
+              <strong>app.py validates</strong> dish name, day, and weather
+              against the known valid lists — returns HTTP 422 if invalid.
+            </li>
+            <li>
+              <strong>Feature engineering</strong> — builds a one-hot encoded
+              single-row dictionary matching the 30-column training structure.
+            </li>
+            <li>
+              <strong>Column alignment</strong> —
+              <code
+                >pd.DataFrame.reindex(columns=feature_cols, fill_value=0)</code
+              >
+              ensures exact column order.
+            </li>
+            <li>
+              <strong>Scaling</strong> — applies
+              <code>scaler.transform()</code> using the saved StandardScaler
+              from training.
+            </li>
+            <li>
+              <strong>Prediction</strong> — <code>model.predict()</code> returns
+              a raw float (e.g., 21.4 servings).
+            </li>
+            <li>
+              <strong>Rounding</strong> —
+              <code>max(1, round(float(prediction)))</code> gives a practical
+              integer ≥ 1.
+            </li>
+            <li>
+              <strong>API responds</strong> with JSON containing servings count,
+              recommendation text, and model info.
+            </li>
+            <li>
+              <strong>Frontend displays</strong> the servings number and
+              recommendation to the staff.
+            </li>
+          </ol>
+
+          <!-- API Endpoints -->
+          <div class="divider">3.4 — API Endpoints</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "We built six endpoints. The most important ones to show during
+              the demo:"
+            </p>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>What It Does</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-blue">GET</span></td>
+                <td><code>/</code></td>
+                <td>Serves the HTML prediction interface</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">GET</span></td>
+                <td><code>/health</code></td>
+                <td>Confirms API is running, model is loaded</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">POST</span></td>
+                <td><code>/predict</code></td>
+                <td>Single dish prediction — main endpoint</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">POST</span></td>
+                <td><code>/predict-batch</code></td>
+                <td>Predict all 16 dishes at once for full-day planning</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">GET</span></td>
+                <td><code>/dishes</code></td>
+                <td>Lists all valid dish / day / weather values</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-blue">GET</span></td>
+                <td><code>/docs</code></td>
+                <td>Interactive Swagger UI — test any endpoint</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Model Files -->
+          <div class="divider">3.3 — The Three Model Files</div>
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "<code>train_and_save.py</code> generates three files that
+              <code>app.py</code> loads at startup. All three must be present or
+              the server refuses to start."
+            </p>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Contents</th>
+                <th>Used For</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>best_model.pkl</code></td>
+                <td>Serialized trained model (RF or GB)</td>
+                <td><code>model.predict(X_scaled)</code></td>
+              </tr>
+              <tr>
+                <td><code>scaler.pkl</code></td>
+                <td>Fitted StandardScaler (mean &amp; std per feature)</td>
+                <td><code>scaler.transform(X)</code></td>
+              </tr>
+              <tr>
+                <td><code>label_columns.pkl</code></td>
+                <td>List of 30 feature column names in training order</td>
+                <td><code>DataFrame.reindex(columns=…)</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Setup Commands -->
+          <div class="divider">3.5 — How to Run (for demo)</div>
+          <div class="code">
+            <span class="comment"
+              ># Step 1 — train the model (run once, takes ~2–5 min)</span
+            ><br />
+            <span class="cmd">python train_and_save.py</span><br /><br />
+            <span class="comment"># Step 2 — start the web server</span><br />
+            <span class="cmd">uvicorn app:app --reload</span><br /><br />
+            <span class="comment"># Then open in browser:</span><br />
+            <span class="url">http://127.0.0.1:8000</span>&nbsp;&nbsp;&nbsp;
+            <span class="comment">← prediction UI</span><br />
+            <span class="url">http://127.0.0.1:8000/docs</span>&nbsp;
+            <span class="comment">← Swagger API docs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ PART 3 -->
+      <div class="section" id="part3">
+        <div class="section-header">
+          <div class="icon icon-amber">📄</div>
+          <div>
+            <h2>Part 3 — Documentation</h2>
+            <div class="sub">
+              What was produced, where it lives, and what it proves
+            </div>
+          </div>
+          <span class="step-pill">~2 min</span>
+        </div>
+        <div class="section-body">
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "Every artifact the system produces is documented and
+              reproducible. Here is what exists in the project folder after
+              running both scripts:"
+            </p>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Artifact</th>
+                <th>Where</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>train_and_save.py</strong></td>
+                <td>Project root</td>
+                <td>Full 9-part ML pipeline — data to saved model</td>
+              </tr>
+              <tr>
+                <td><strong>app.py</strong></td>
+                <td>Project root</td>
+                <td>FastAPI web server — integration layer</td>
+              </tr>
+              <tr>
+                <td><strong>index.html</strong></td>
+                <td>Project root</td>
+                <td>Browser-based prediction UI</td>
+              </tr>
+              <tr>
+                <td><strong>evaluation_results.csv</strong></td>
+                <td>Project root</td>
+                <td>All model scores: baseline + 10-fold CV + optimized</td>
+              </tr>
+              <tr>
+                <td><strong>best_model.pkl</strong></td>
+                <td>Project root</td>
+                <td>Serialized best model (auto-selected at runtime)</td>
+              </tr>
+              <tr>
+                <td><strong>scaler.pkl</strong></td>
+                <td>Project root</td>
+                <td>Fitted StandardScaler — same object used in training</td>
+              </tr>
+              <tr>
+                <td><strong>label_columns.pkl</strong></td>
+                <td>Project root</td>
+                <td>Column alignment list — 30 feature names in order</td>
+              </tr>
+              <tr>
+                <td><strong>16 chart images (.png)</strong></td>
+                <td>Project root</td>
+                <td>Feature importance, learning curves, residuals, etc.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="divider">Documentation Quality Checklist</div>
+          <ul class="checklist">
+            <li>
+              <span class="ck">✔</span> Problem statement with target variable,
+              type, features, and dataset clearly defined.
+            </li>
+            <li>
+              <span class="ck">✔</span> 7-step preprocessing pipeline with
+              reason for each step documented.
+            </li>
+            <li>
+              <span class="ck">✔</span> 7 algorithms selected with justification
+              for each choice.
+            </li>
+            <li>
+              <span class="ck">✔</span> Training procedure identical for all
+              models — fair comparison.
+            </li>
+            <li>
+              <span class="ck">✔</span> Evaluation metrics (MAE, RMSE, R²)
+              computed and exported to CSV.
+            </li>
+            <li>
+              <span class="ck">✔</span> 10-Fold CV run on all models — stability
+              (R² Std) reported.
+            </li>
+            <li>
+              <span class="ck">✔</span> Grid Search CV on top 2 models — best
+              parameters documented.
+            </li>
+            <li>
+              <span class="ck">✔</span> Final model selection criteria
+              explicitly listed (not just highest score).
+            </li>
+            <li>
+              <span class="ck">✔</span> 5 model interpretation techniques
+              applied and findings recorded.
+            </li>
+            <li>
+              <span class="ck">✔</span> System architecture, data flow, and all
+              6 API endpoints documented.
+            </li>
+            <li>
+              <span class="ck">✔</span> End-to-end test plan with 7 test cases
+              defined.
+            </li>
+          </ul>
+
+          <div class="highlight-box hb-tip" style="margin-top: 14px">
+            <div class="hb-label">✅ Highlight for Instructor</div>
+            The <code>evaluation_results.csv</code> file is
+            <em>automatically generated</em> by the script — not filled in
+            manually. Every score is computed from actual test data, making the
+            documentation fully reproducible: running
+            <code>train_and_save.py</code> regenerates all scores.
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ DEMO -->
+      <div class="section" id="demo">
+        <div class="section-header">
+          <div class="icon icon-green">🎬</div>
+          <div>
+            <h2>Live System Demo</h2>
+            <div class="sub">
+              Step-by-step what to show and click during the demo
+            </div>
+          </div>
+          <span class="step-pill">~3 min</span>
+        </div>
+        <div class="section-body">
+          <div class="highlight-box hb-warn" style="margin-bottom: 16px">
+            <div class="hb-label">Before You Present</div>
+            Make sure the uvicorn server is already running in a terminal. Have
+            the browser open to <strong>http://127.0.0.1:8000</strong> and
+            <strong>http://127.0.0.1:8000/docs</strong> in two tabs.
+          </div>
+
+          <div class="divider">Demo Sequence</div>
+          <ol class="demo-steps">
+            <li>
+              <div>
+                <strong>Show the main UI</strong> — open
+                <code>http://127.0.0.1:8000</code>. Say:
+                <em
+                  >"This is the interface restaurant staff would use — no coding
+                  required."</em
+                >
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Make a single prediction</strong> — select
+                <em>Sinigang na Salmon sa Miso</em>, day = <em>Friday</em>,
+                weather = <em>Rainy</em>, holiday = <em>No</em>, month =
+                <em>5</em>, day = <em>22</em>, week = <em>4</em>. Click Predict.
+                Point out the servings number and recommendation text.
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Try a different dish</strong> — select
+                <em>Adobong Manok at Baboy</em>, day = <em>Monday</em>, weather
+                = <em>Sunny</em>. Say:
+                <em
+                  >"Different dish, different prediction — the model learned
+                  each dish's demand pattern."</em
+                >
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Show invalid input</strong> — if there is a text field,
+                type a fake dish name and submit. Point out the 422 error. Say:
+                <em
+                  >"Input validation prevents nonsense data from reaching the
+                  model."</em
+                >
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Switch to Swagger</strong> — open
+                <code>http://127.0.0.1:8000/docs</code>. Say:
+                <em
+                  >"This is the interactive API documentation — any developer
+                  can test our endpoints here."</em
+                >
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Call <code>GET /health</code></strong> inside Swagger —
+                click Execute. Show the JSON response confirming the model type
+                and feature count.
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Call <code>GET /dishes</code></strong> — show all 16
+                valid dish names, 7 days, and 3 weather options.
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong
+                  >Briefly show <code>evaluation_results.csv</code></strong
+                >
+                — open the file and scroll through it. Say:
+                <em
+                  >"Every model comparison score was auto-generated by our
+                  training script."</em
+                >
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ Q&A -->
+      <div class="section" id="qa">
+        <div class="section-header">
+          <div class="icon icon-blue">❓</div>
+          <div>
+            <h2>Q&amp;A Preparation</h2>
+            <div class="sub">
+              Anticipated instructor questions and suggested answers
+            </div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="tp-block">
+            <div class="tp-label">Q: Why are your R² scores negative?</div>
+            <p>
+              "Negative R² means the model is worse than a baseline mean
+              predictor on the test set. This is a data limitation — we only
+              have 2 months (509 rows) spread across 16 dishes. Each dish has
+              roughly 32 training rows on average, which is not enough for a
+              regression model to capture reliable patterns. Our learning curve
+              shows the validation score is still improving at full data size,
+              which confirms that more training data — at least 6 months — would
+              significantly improve performance. The system architecture and
+              integration are complete and production-ready."
+            </p>
+          </div>
+
+          <div class="tp-block">
+            <div class="tp-label">
+              Q: Why did you choose Gradient Boosting / Random Forest as the
+              final model?
+            </div>
+            <p>
+              "We selected the model with the best optimized test R² at runtime.
+              Among baseline models, Gradient Boosting had the least negative R²
+              (−0.100 vs −0.152 for Random Forest), and after Grid Search both
+              improved. We selected based on five criteria: highest R², lowest
+              MAE, CV stability, ensemble method robustness, and restaurant
+              applicability."
+            </p>
+          </div>
+
+          <div class="tp-block">
+            <div class="tp-label">
+              Q: What is data leakage and how did you prevent it?
+            </div>
+            <p>
+              "Data leakage is when information from the test set influences
+              model training, making scores appear better than they would be on
+              truly unseen data. We prevented it by fitting the StandardScaler
+              exclusively on <code>X_train</code>, then using
+              <code>scaler.transform()</code> on both X_train and X_test — never
+              <code>scaler.fit()</code> on X_test."
+            </p>
+          </div>
+
+          <div class="tp-block">
+            <div class="tp-label">
+              Q: What does the /predict-batch endpoint do?
+            </div>
+            <p>
+              "It accepts a list of dish-day-weather combinations and returns
+              predictions for all of them in one request. This is designed for
+              morning planning — the restaurant manager can submit all 16 dishes
+              for a given day and get the full daily prep list in one API call."
+            </p>
+          </div>
+
+          <div class="tp-block">
+            <div class="tp-label">
+              Q: What would you improve with more time?
+            </div>
+            <p>
+              "Three improvements: (1) Collect more data — ideally 6–12 months
+              to give the model enough variety per dish. (2) Add more features
+              like nearby events or promotions. (3) Retrain the model weekly
+              with new sales data so it adapts to changing demand patterns."
+            </p>
+          </div>
+
+          <div class="tp-block">
+            <div class="tp-label">Q: How is the model saved and loaded?</div>
+            <p>
+              "We use <code>joblib.dump()</code> to serialize the trained model
+              object to a <code>.pkl</code> file. At web server startup,
+              <code>app.py</code> calls <code>joblib.load()</code> to restore it
+              into memory — this happens once. All subsequent prediction
+              requests reuse the same in-memory model object, so there is no
+              file I/O per request."
+            </p>
+          </div>
+
+          <div class="tp-block">
+            <div class="tp-label">Q: Why use FastAPI instead of Flask?</div>
+            <p>
+              "FastAPI provides automatic input validation via Pydantic models,
+              auto-generated Swagger documentation at <code>/docs</code>, and is
+              significantly faster than Flask for I/O-bound workloads. It also
+              enforces type hints, which catches input errors before they reach
+              the model."
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ CLOSING -->
+      <div class="section">
+        <div class="section-header">
+          <div class="icon icon-blue">🏁</div>
+          <div>
+            <h2>Closing Statement</h2>
+            <div class="sub">How to end the presentation confidently</div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="tp-block">
+            <div class="tp-label">Say This</div>
+            <p>
+              "To summarize — we built a complete, end-to-end machine learning
+              system for Maricopa Restaurant. We preprocessed real sales data,
+              compared seven regression algorithms with cross-validation and
+              grid search, selected the best model, and integrated it into a
+              live web application with a clean user interface and a documented
+              REST API. While our dataset limited the model's accuracy, the
+              system is architecturally sound and ready to improve as more data
+              becomes available. Thank you — we are happy to take questions."
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

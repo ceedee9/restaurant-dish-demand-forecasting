@@ -1,0 +1,17 @@
+Model,Stage,MAE,RMSE,R2,CV_R2_Mean,CV_R2_Std
+Linear Regression,Baseline,2.9451,3.3895,-0.0537,,
+Ridge Regression,Baseline,2.9448,3.3889,-0.0534,,
+Lasso Regression,Baseline,2.9439,3.3838,-0.0502,,
+Decision Tree,Baseline,3.3725,4.1539,-0.5826,,
+Random Forest,Baseline,3.1138,3.5445,-0.1523,,
+Gradient Boosting,Baseline,2.9809,3.4636,-0.1003,,
+KNN,Baseline,3.1176,3.6734,-0.2376,,
+Linear Regression,10-Fold CV,2.821,3.2869,-0.065,-0.065,0.0788
+Ridge Regression,10-Fold CV,2.8208,3.2864,-0.0647,-0.0647,0.0786
+Lasso Regression,10-Fold CV,2.8188,3.28,-0.0603,-0.0603,0.0761
+Decision Tree,10-Fold CV,3.637,4.481,-0.9793,-0.9793,0.1668
+Random Forest,10-Fold CV,2.883,3.3863,-0.1327,-0.1327,0.1252
+Gradient Boosting,10-Fold CV,2.8614,3.3757,-0.1271,-0.1271,0.1418
+KNN,10-Fold CV,3.0018,3.5143,-0.2165,-0.2165,0.0922
+Random Forest,Optimized,2.934,3.3341,-0.0196,-0.0218,
+Gradient Boosting,Optimized,2.9714,3.3777,-0.0464,-0.0771,

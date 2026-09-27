@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maricopa Restaurant, Dish Demand Forecasting</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #f7f3ee;
+        color: #1e293b;
+        min-height: 100vh;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          #1c1a18 0%,
+          #8b1c1c 55%,
+          #c47a35 100%
+        );
+        color: white;
+        padding: 22px 32px;
+        text-align: center;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+      }
+      header h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      header p {
+        font-size: 13px;
+        opacity: 0.85;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 28px auto;
+        padding: 0 16px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+      }
+      .card h2 {
+        font-size: 15px;
+        color: #8b1c1c;
+        margin-bottom: 18px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0d9b5;
+      }
+
+      /* Stats row */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .stat {
+        background: #fdf6ec;
+        border-radius: 8px;
+        padding: 14px;
+        text-align: center;
+        border: 1px solid #e8c99a;
+      }
+      .stat .val {
+        font-size: 22px;
+        font-weight: 700;
+        color: #8b1c1c;
+      }
+      .stat .lbl {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 3px;
+      }
+
+      /* Form */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .form-group select,
+      .form-group input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #1e293b;
+        transition: border-color 0.2s;
+        outline: none;
+        background: white;
+      }
+      .form-group select:focus,
+      .form-group input:focus {
+        border-color: #c47a35;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #8b1c1c, #c47a35);
+        color: white;
+        flex: 1;
+      }
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+      }
+      .btn:hover {
+        opacity: 0.88;
+      }
+      .btn:active {
+        opacity: 0.72;
+      }
+
+      /* Result */
+      .result-box {
+        display: none;
+        background: #f0fdf4;
+        border: 1.5px solid #22c55e;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 18px;
+        text-align: center;
+      }
+      .result-box .dish-lbl {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .result-box .servings {
+        font-size: 52px;
+        font-weight: 800;
+        color: #8b1c1c;
+        line-height: 1.1;
+        margin: 6px 0;
+      }
+      .result-box .unit {
+        font-size: 16px;
+        color: #64748b;
+      }
+      .result-box .rec {
+        font-size: 14px;
+        color: #15803d;
+        margin-top: 8px;
+        font-weight: 500;
+      }
+
+      .error-box {
+        display: none;
+        background: #fff5f5;
+        border: 1.5px solid #fc8181;
+        border-radius: 10px;
+        padding: 14px;
+        margin-top: 14px;
+        color: #c53030;
+        font-size: 13px;
+      }
+      .loading {
+        display: none;
+        text-align: center;
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 12px;
+      }
+      .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 3px solid #f0d9b5;
+        border-top-color: #8b1c1c;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Batch table */
+      .batch-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+        font-size: 13px;
+      }
+      .batch-table th {
+        background: #6b1515;
+        color: white;
+        padding: 9px 12px;
+        text-align: left;
+      }
+      .batch-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #f0dfc8;
+      }
+      .batch-table tr:nth-child(even) td {
+        background: #fdf6ec;
+      }
+      .badge {
+        display: inline-block;
+        background: #fdf0dc;
+        color: #8b1c1c;
+        border-radius: 20px;
+        padding: 2px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+      .tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: #64748b;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        color: #8b1c1c;
+        border-bottom-color: #8b1c1c;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      /* ── Logo & header layout ── */
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+      }
+      .header-logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.55);
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      }
+      .header-text {
+        text-align: left;
+      }
+
+      /* ── Restaurant photo gallery ── */
+      .gallery-section {
+        background: #1c1a18;
+        padding: 14px 20px;
+      }
+      .gallery-strip {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        justify-content: center;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        padding-bottom: 4px;
+      }
+      .gallery-strip::-webkit-scrollbar {
+        height: 4px;
+      }
+      .gallery-strip::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+      }
+      .gallery-strip img {
+        height: 150px;
+        min-width: 220px;
+        object-fit: cover;
+        border-radius: 8px;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .gallery-strip img:hover {
+        transform: scale(1.03);
+      }
+
+      /* ── Dish photo preview (in form) ── */
+      .dish-preview {
+        display: none;
+        margin-top: 14px;
+        text-align: center;
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+      }
+      .dish-preview img {
+        max-height: 160px;
+        max-width: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+      .dish-preview p {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 6px;
+        font-style: italic;
+      }
+
+      /* ── Dish image inside result box ── */
+      .result-dish-img {
+        width: 130px;
+        height: 95px;
+        object-fit: cover;
+        border-radius: 8px;
+        display: none;
+        margin: 0 auto 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      }
+
+      /* ── Lightbox overlay ── */
+      .lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+      }
+      .lightbox.open {
+        display: flex;
+      }
+      .lightbox img {
+        max-width: 90vw;
+        max-height: 88vh;
+        border-radius: 10px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <img
+          src="/images/logo.jpg"
+          alt="Maricopa Restaurant Logo"
+          class="header-logo"
+          onerror="
+            this.src = '/images/logo.png';
+            this.onerror = function () {
+              this.style.display = 'none';
+            };
+          "
+        />
+        <div class="header-text">
+          <h1>Maricopa Restaurant, Dish Demand Forecasting</h1>
+          <p>
+            Powered by Optimized Machine Learning | IPT 101: De los Reyes, Carlo
+            M. Enoria, Jorich Maricar C. Mercado, Vesti Sahm Angielo, Santiago,
+            Luis Ishmael C. | BSIT 3-2
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Restaurant photo gallery -->
+    <div class="gallery-section" id="gallery-section">
+      <div class="gallery-strip" id="gallery-strip">
+        <img
+          src="/images/restaurant/photo1.jpg"
+          alt="Restaurant"
+          onclick="openLightbox(this.src)"
+          onerror="
+            this.remove();
+            checkGallery();
+          "
+        />
+        <img
+          src="/images/restaurant/photo2.jpg"
+          alt="Restaurant"
+          onclick="openLightbox(this.src)"
+          onerror="
+            this.remove();
+            checkGallery();
+          "
+        />
+        <img
+          src="/images/restaurant/photo3.jpg"
+          alt="Restaurant"
+          onclick="openLightbox(this.src)"
+          onerror="
+            this.remove();
+            checkGallery();
+          "
+        />
+        <img
+          src="/images/restaurant/photo4.jpg"
+          alt="Restaurant"
+          onclick="openLightbox(this.src)"
+          onerror="
+            this.remove();
+            checkGallery();
+          "
+        />
+        <img
+          src="/images/restaurant/photo5.jpg"
+          alt="Restaurant"
+          onclick="openLightbox(this.src)"
+          onerror="
+            this.remove();
+            checkGallery();
+          "
+        />
+      </div>
+    </div>
+
+    <!-- Lightbox overlay -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+      <img id="lightbox-img" src="" alt="" />
+    </div>
+
+    <div class="container">
+      <!-- Model Stats -->
+      <div class="card">
+        <h2>Model Performance Summary</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="val" id="stat-r2">—</div>
+            <div class="lbl">R² Score</div>
+          </div>
+          <div class="stat">
+            <div class="val" id="stat-mae">—</div>
+            <div class="lbl">MAE (servings)</div>
+          </div>
+          <div class="stat">
+            <div class="val" id="stat-model">—</div>
+            <div class="lbl">Model Type</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('single')">
+          Single Prediction
+        </div>
+        <div class="tab" onclick="switchTab('batch')">Daily Menu Plan</div>
+      </div>
+
+      <!-- SINGLE PREDICTION -->
+      <div id="tab-single" class="tab-content active">
+        <div class="card">
+          <h2>Predict Servings for One Dish</h2>
+          <p
+            style="
+              font-size: 12px;
+              color: #92400e;
+              background: #fef3c7;
+              border: 1px solid #fcd34d;
+              border-radius: 6px;
+              padding: 8px 12px;
+              margin-bottom: 14px;
+            "
+          >
+            <strong>Note:</strong> The model was trained on
+            <strong>March &amp; April 2026</strong> data only. Predictions for
+            those months are most accurate. Other months are estimates by
+            extrapolation.
+          </p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Dish Name</label>
+              <select id="dish_name" onchange="updateDishPreview(this.value)">
+                <option value="">— Select a dish —</option>
+                <option>Adobong Manok at Baboy</option>
+                <option>Adobong Pusit</option>
+                <option>Crab Meat Relleno</option>
+                <option>Dinuguan</option>
+                <option>Kare kare</option>
+                <option>Maja Blanca</option>
+                <option>Maricopa's Special Sardines</option>
+                <option>Palitaw</option>
+                <option>Pancit bihon</option>
+                <option>Pinangat na Pampano</option>
+                <option>Shrimp Vegetable Okoy</option>
+                <option>Sinampalukang Manok</option>
+                <option>Sinigang na Salmon sa Miso</option>
+                <option>Sinigang na Ulo ng Bangus</option>
+                <option>Sweet Banana</option>
+                <option>Tortang Talong</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Day of Week</label>
+              <select id="day_of_week">
+                <option value="">— Select day —</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+                <option>Sunday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Weather</label>
+              <select id="weather">
+                <option value="">— Select weather —</option>
+                <option>Sunny</option>
+                <option>Cloudy</option>
+                <option>Rainy</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Public Holiday?</label>
+              <select id="is_holiday">
+                <option value="0">No — Regular Day</option>
+                <option value="1">Yes — Philippine Holiday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Month</label>
+              <select id="month">
+                <option value="1">January (1)</option>
+                <option value="2">February (2)</option>
+                <option value="3">March (3) ✓ trained</option>
+                <option value="4" selected>April (4) ✓ trained</option>
+                <option value="5">May (5)</option>
+                <option value="6">June (6)</option>
+                <option value="7">July (7)</option>
+                <option value="8">August (8)</option>
+                <option value="9">September (9)</option>
+                <option value="10">October (10)</option>
+                <option value="11">November (11)</option>
+                <option value="12">December (12)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Day of Month</label>
+              <input
+                type="number"
+                id="day_of_month"
+                min="1"
+                max="31"
+                value="15"
+                placeholder="1–31"
+              />
+            </div>
+          </div>
+
+          <!-- Dish photo preview -->
+          <div class="dish-preview" id="dish-preview">
+            <img id="dish-preview-img" src="" alt="" />
+            <p id="dish-preview-name"></p>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="predictSingle()">
+              Predict Servings
+            </button>
+            <button class="btn btn-secondary" onclick="resetForm()">
+              Reset
+            </button>
+          </div>
+
+          <div class="loading" id="loading-single">
+            <span class="spinner"></span> Sending to model...
+          </div>
+          <div class="result-box" id="result-single">
+            <img id="res-dish-img" class="result-dish-img" src="" alt="" />
+            <div class="dish-lbl" id="res-dish">—</div>
+            <div class="servings" id="res-servings">—</div>
+            <div class="unit">servings to prepare</div>
+            <div class="rec" id="res-rec">—</div>
+          </div>
+          <div class="error-box" id="error-single"></div>
+        </div>
+      </div>
+
+      <!-- BATCH / DAILY MENU -->
+      <div id="tab-batch" class="tab-content">
+        <div class="card">
+          <h2>Plan the Full Daily Menu</h2>
+          <p style="font-size: 13px; color: #64748b; margin-bottom: 16px">
+            Select the day, weather, and holiday status. The system will predict
+            servings for all 16 dishes at once — your complete daily menu plan.
+          </p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Day of Week</label>
+              <select id="batch_day">
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+                <option>Sunday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Weather</label>
+              <select id="batch_weather">
+                <option>Sunny</option>
+                <option>Cloudy</option>
+                <option>Rainy</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Public Holiday?</label>
+              <select id="batch_holiday">
+                <option value="0">No — Regular Day</option>
+                <option value="1">Yes — Philippine Holiday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Month</label>
+              <select id="batch_month">
+                <option value="1">January (1)</option>
+                <option value="2">February (2)</option>
+                <option value="3">March (3) ✓ trained</option>
+                <option value="4" selected>April (4) ✓ trained</option>
+                <option value="5">May (5)</option>
+                <option value="6">June (6)</option>
+                <option value="7">July (7)</option>
+                <option value="8">August (8)</option>
+                <option value="9">September (9)</option>
+                <option value="10">October (10)</option>
+                <option value="11">November (11)</option>
+                <option value="12">December (12)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Day of Month</label>
+              <input
+                type="number"
+                id="batch_day_num"
+                min="1"
+                max="31"
+                value="15"
+              />
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="predictBatch()">
+              Generate Full Menu Plan
+            </button>
+          </div>
+          <div class="loading" id="loading-batch">
+            <span class="spinner"></span> Predicting all 16 dishes...
+          </div>
+          <div id="batch-results"></div>
+          <div class="error-box" id="error-batch"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      IPT 101 — Integrative Programming and Technologies &nbsp;|&nbsp; De los
+      Reyes, Carlo M. Enoria, Jorich Maricar C. Mercado, Vesti Sahm Angielo,
+      Santiago, Luis Ishmael C.&nbsp;|&nbsp; BSIT 3-2 &nbsp;|&nbsp; May 2026
+    </footer>
+
+    <script>
+      const API = ""; // Same origin — FastAPI serves this HTML
+
+      // ── Dish image filenames (place files in images/dishes/) ──────────────
+      const DISH_IMAGES = {
+        "Adobong Manok at Baboy": "adobong_manok_at_baboy",
+        "Adobong Pusit": "adobong_pusit",
+        "Crab Meat Relleno": "crab_meat_relleno",
+        Dinuguan: "dinuguan",
+        "Kare kare": "kare_kare",
+        "Maja Blanca": "maja_blanca",
+        "Maricopa's Special Sardines": "maricopas_special_sardines",
+        Palitaw: "palitaw",
+        "Pancit bihon": "pancit_bihon",
+        "Pinangat na Pampano": "pinangat_na_pampano",
+        "Shrimp Vegetable Okoy": "shrimp_vegetable_okoy",
+        "Sinampalukang Manok": "sinampalukang_manok",
+        "Sinigang na Salmon sa Miso": "sinigang_na_salmon_sa_miso",
+        "Sinigang na Ulo ng Bangus": "sinigang_na_ulo_ng_bangus",
+        "Sweet Banana": "sweet_banana",
+        "Tortang Talong": "tortang_talong",
+      };
+
+      function getDishImg(dish) {
+        const slug = DISH_IMAGES[dish];
+        return slug ? `/images/dishes/${slug}.jpg` : null;
+      }
+
+      // Show/hide dish photo when user picks a dish
+      function updateDishPreview(dish) {
+        const preview = document.getElementById("dish-preview");
+        const img = document.getElementById("dish-preview-img");
+        const label = document.getElementById("dish-preview-name");
+        if (!dish) {
+          preview.style.display = "none";
+          return;
+        }
+        const url = getDishImg(dish);
+        if (!url) {
+          preview.style.display = "none";
+          return;
+        }
+        img.alt = dish;
+        label.textContent = dish;
+        img.src = url;
+        img.onload = () => {
+          preview.style.display = "block";
+        };
+        img.onerror = () => {
+          // try .png fallback
+          img.onerror = () => {
+            preview.style.display = "none";
+          };
+          img.src = url.replace(".jpg", ".png");
+        };
+      }
+
+      // Gallery: hide section if all photos are missing
+      function checkGallery() {
+        const strip = document.getElementById("gallery-strip");
+        if (strip && strip.querySelectorAll("img").length === 0) {
+          document.getElementById("gallery-section").style.display = "none";
+        }
+      }
+
+      // Lightbox for restaurant photos
+      function openLightbox(src) {
+        document.getElementById("lightbox-img").src = src;
+        document.getElementById("lightbox").classList.add("open");
+      }
+      function closeLightbox() {
+        document.getElementById("lightbox").classList.remove("open");
+      }
+
+      const DISHES = [
+        "Adobong Manok at Baboy",
+        "Adobong Pusit",
+        "Crab Meat Relleno",
+        "Dinuguan",
+        "Kare kare",
+        "Maja Blanca",
+        "Maricopa's Special Sardines",
+        "Palitaw",
+        "Pancit bihon",
+        "Pinangat na Pampano",
+        "Shrimp Vegetable Okoy",
+        "Sinampalukang Manok",
+        "Sinigang na Salmon sa Miso",
+        "Sinigang na Ulo ng Bangus",
+        "Sweet Banana",
+        "Tortang Talong",
+      ];
+
+      // Load model info on page load
+      window.addEventListener("load", async () => {
+        try {
+          const res = await fetch(`${API}/model-info`);
+          const data = await res.json();
+          document.getElementById("stat-model").textContent = data.model_type
+            .replace("Regressor", "")
+            .trim();
+          document.getElementById("stat-r2").textContent = data.performance.R2;
+          document.getElementById("stat-mae").textContent =
+            data.performance.MAE.split(" ")[0];
+        } catch (e) {
+          console.log("Could not load model info:", e);
+        }
+      });
+
+      // Tab switching
+      function switchTab(name) {
+        document.querySelectorAll(".tab").forEach((t, i) => {
+          t.classList.toggle("active", ["single", "batch"][i] === name);
+        });
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+      }
+
+      // Reset form
+      function resetForm() {
+        ["dish_name", "day_of_week", "weather"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("is_holiday").value = "0";
+        document.getElementById("day_of_month").value = "15";
+        document.getElementById("result-single").style.display = "none";
+        document.getElementById("error-single").style.display = "none";
+      }
+
+      // Single prediction
+      async function predictSingle() {
+        const dish = document.getElementById("dish_name").value;
+        const day = document.getElementById("day_of_week").value;
+        const wx = document.getElementById("weather").value;
+        const hol = parseInt(document.getElementById("is_holiday").value);
+        const month = parseInt(document.getElementById("month").value);
+        const dayNum = parseInt(document.getElementById("day_of_month").value);
+
+        // Hide previous results
+        document.getElementById("result-single").style.display = "none";
+        document.getElementById("error-single").style.display = "none";
+
+        // Validate
+        if (!dish || !day || !wx) {
+          showError(
+            "error-single",
+            "Please select a dish, day of week, and weather.",
+          );
+          return;
+        }
+
+        document.getElementById("loading-single").style.display = "block";
+
+        // Week of month (approximate)
+        const weekOfMonth = Math.ceil(dayNum / 7);
+
+        try {
+          const res = await fetch(`${API}/predict`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              dish_name: dish,
+              day_of_week: day,
+              weather: wx,
+              is_holiday: hol,
+              month: month,
+              day_of_month: dayNum,
+              week_of_month: weekOfMonth,
+            }),
+          });
+          const data = await res.json();
+          document.getElementById("loading-single").style.display = "none";
+
+          if (res.ok) {
+            document.getElementById("res-dish").textContent = dish;
+            document.getElementById("res-servings").textContent =
+              data.prediction.servings;
+            document.getElementById("res-rec").textContent =
+              `✅ ${data.prediction.recommendation}`;
+
+            // Show dish photo in result box
+            const resImg = document.getElementById("res-dish-img");
+            const imgUrl = getDishImg(dish);
+            if (imgUrl) {
+              resImg.src = imgUrl;
+              resImg.style.display = "block";
+              resImg.onerror = function () {
+                this.src = imgUrl.replace(".jpg", ".png");
+                this.onerror = function () {
+                  this.style.display = "none";
+                };
+              };
+            } else {
+              resImg.style.display = "none";
+            }
+
+            document.getElementById("result-single").style.display = "block";
+          } else {
+            showError("error-single", data.detail || "Prediction failed.");
+          }
+        } catch (e) {
+          document.getElementById("loading-single").style.display = "none";
+          showError(
+            "error-single",
+            "Cannot connect to API. Make sure uvicorn is running.",
+          );
+        }
+      }
+
+      // Batch prediction — all 16 dishes
+      async function predictBatch() {
+        const day = document.getElementById("batch_day").value;
+        const wx = document.getElementById("batch_weather").value;
+        const hol = parseInt(document.getElementById("batch_holiday").value);
+        const month = parseInt(document.getElementById("batch_month").value);
+        const dayNum = parseInt(document.getElementById("batch_day_num").value);
+        const week = Math.ceil(dayNum / 7);
+
+        document.getElementById("batch-results").innerHTML = "";
+        document.getElementById("error-batch").style.display = "none";
+        document.getElementById("loading-batch").style.display = "block";
+
+        const payload = {
+          predictions: DISHES.map((dish) => ({
+            dish_name: dish,
+            day_of_week: day,
+            weather: wx,
+            is_holiday: hol,
+            month,
+            day_of_month: dayNum,
+            week_of_month: week,
+          })),
+        };
+
+        try {
+          const res = await fetch(`${API}/predict-batch`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json();
+          document.getElementById("loading-batch").style.display = "none";
+
+          if (res.ok) {
+            renderBatchResults(data, day, wx, hol);
+          } else {
+            showError("error-batch", data.detail || "Batch prediction failed.");
+          }
+        } catch (e) {
+          document.getElementById("loading-batch").style.display = "none";
+          showError(
+            "error-batch",
+            "Cannot connect to API. Make sure uvicorn is running.",
+          );
+        }
+      }
+
+      function renderBatchResults(data, day, weather, isHoliday) {
+        const sorted = [...data.predictions].sort(
+          (a, b) => b.servings - a.servings,
+        );
+        const holidayBadge = isHoliday
+          ? '<span class="badge" style="background:#FEE2E2;color:#991B1B">Holiday</span>'
+          : "";
+
+        let html = `
+    <div style="margin-top:16px;padding:12px 16px;background:#FDF6EC;
+                border-radius:8px;border:1px solid #E8C99A;font-size:13px;">
+      <strong>Daily Menu Plan</strong> — ${day} | ${weather} ${holidayBadge}<br>
+      <span style="color:#64748B">Total predicted servings: 
+        <strong>${data.total_servings}</strong> across all ${data.total_dishes} dishes
+      </span>
+    </div>
+    <table class="batch-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Dish</th>
+          <th style="text-align:center">Servings to Prepare</th>
+          <th>Recommendation</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+        sorted.forEach((r, i) => {
+          const level =
+            r.servings >= 22 ? "High" : r.servings >= 18 ? "Medium" : "Low";
+          html += `
+      <tr>
+        <td style="color:#94A3B8">${i + 1}</td>
+        <td><strong>${r.dish_name}</strong></td>
+        <td style="text-align:center;font-size:18px;font-weight:700;color:#8B1C1C">
+          ${r.servings}
+        </td>
+        <td>${level} demand</td>
+      </tr>
+    `;
+        });
+
+        html += `</tbody></table>`;
+        document.getElementById("batch-results").innerHTML = html;
+      }
+
+      function showError(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = "❌ " + msg;
+        el.style.display = "block";
+        document.getElementById("loading-single") &&
+          (document.getElementById("loading-single").style.display = "none");
+        document.getElementById("loading-batch") &&
+          (document.getElementById("loading-batch").style.display = "none");
+      }
+    </script>
+  </body>
+</html>
